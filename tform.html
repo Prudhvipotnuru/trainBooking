@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bootstrap Input Form</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style type="text/css">
+    /* Styling for the modal-like overlay */
+.focus-overlay {
+    display: none; /* Initially hidden */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Dimmed background */
+    z-index: 10; /* High z-index to ensure it's on top */
+    display: flex;
+    justify-content: center; /* Center the focused area */
+    align-items: center; /* Vertically center */
+}
+
+/* Styling for the focused area */
+.focused-area {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px; /* Smooth corners */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center; /* Center text */
+}
+/* Styling for the text summary in the focused area */
+#data {
+    font-size: 16px; /* Increase font size for readability */
+    color: #333; /* Dark text color */
+    margin-bottom: 10px; /* Spacing between the summary and table */
+    text-align: left; /* Align text to the left */
+    line-height: 1.5; /* Space between lines */
+}
+
+/* Styling for the ticket table in the focused area */
+#ticket {
+    width: 100%; /* Full-width table */
+    border-collapse: collapse; /* No space between cells */
+    border: 1px solid #ddd; /* Border for the table */
+    background-color: #f9f9f9; /* Light background */
+    padding: 10px; /* Padding around the table */
+}
+
+#ticket th, #ticket td {
+    padding: 8px; /* Padding for cells */
+    border: 1px solid #ddd; /* Borders for cells */
+    text-align: left; /* Align text to the left */
+}
+
+#ticket th {
+    background-color: #e2e2e2; /* Light grey background for headers */
+    font-weight: bold; /* Bold text for headers */
+}
+
+#ticket tbody tr:nth-child(odd) {
+    background-color: #f1f1f1; /* Slightly different color for odd rows */
+}
+
+#ticket tbody tr:nth-child(even) {
+    background-color: #ffffff; /* Default background for even rows */
+}
+
+    
+  </style>
+</head>
+<body>
+  <div class="container">
+    <button class="btn btn-primary" id="logout">LOGOUT</button>
+    <div class="card">
+      <div class="card-body">
+        <h2 class="card-title">Train Ticket Booking</h2>
+        <form>
+          <div class="form-row">
+            <div class="form-group col">
+              <label for="inputFrom">From</label>
+              <select name="inputFrom" id="inputFrom" class="form-control">
+                																									
+              </select>
+            </div>
+            <div class="form-group col">
+              <label for="inputTwo">Two</label>
+              <select name="inputTwo" id="inputTwo" class="form-control">
+
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col">
+              <label for="inputTrain">Train</label>
+              <select name="inputTrain" id="inputTrain" class="form-control">
+                <option selected>Choose...</option>
+              
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col">
+              <label for="inputDate">Date</label>
+              <input name="inputDate" type="date" class="form-control" id="inputDate">
+            </div>
+            <div class="form-group col">
+              <label for="inputClass">Class</label>
+              <select name="inputClass" id="inputClass" class="form-control">
+                <option selected>Choose...</option>
+                <option>Economy</option>
+                <option>Business</option>
+                <option>First Class</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="passengerTable">Passenger Details</label>
+            <div class="table-responsive">
+              <table class="table table-auto" id="passengerTable">
+                <thead>
+                  <tr>
+                    <th scope="col">Sno</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Gender</th>
+                    <th scope="col">Age</th>
+                    <th scope="col">Berth Preference</th>
+                    <th scope="col">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Passenger details rows will be added dynamically here -->
+                </tbody>
+              </table>
+            </div>
+            <button type="button" class="btn btn-primary" id="addPassenger">Add Passenger</button>
+          </div>
+          <button id="bookingForm" type="submit" class="btn btn-primary">Submit</button>
+        </form>
+        
+        <div class="container mt-5">
+          <button id="highlightButton" class="btn btn-primary">Show Ticket</button>
+        </div>
+
+        <!-- Highlighted Section with modal-like overlay -->
+        <div id="highlightSection" class="focus-overlay" style="display:none">
+          <div class="focused-area">
+            <div id="data"></div>
+            <table border="1"id="ticket"></table>
+            <button id="closeButton" class="btn btn-secondary">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="tform.js"></script>
+  <!-- Custom JavaScript -->
+  <script>
+    $(document).ready(function() {
+      var counter = 1;
+
+      $('#addPassenger').click(function() {
+        var newRow = `<tr>
+                        <td>${counter}</td>
+                        <td><input type="text" class="form-control" name="passengerName[]" placeholder="Enter name"></td>
+                        <td>
+                          <select class="form-control" name="passengerGender[]">
+                            <option selected>Choose...</option>
+                            <option>Male</option>
+                            <option>Female</option>
+                          </select>
+                        </td>
+                        <td><input type="number" class="form-control" name="passengerAge[]" placeholder="Enter age"></td>
+                        <td>
+                          <select class="form-control" name="berthPreference[]">
+                            <option selected>Choose...</option>
+                            <option>Upper</option>
+                            <option>Middle</option>
+                            <option>Lower</option>
+                            <option>Side Upper</option>
+                            <option>Side Lower</option>
+                          </select>
+                        </td>
+                        <td><button type="button" class="btn btn-danger remove-passenger">Remove</button></td>
+                      </tr>`;
+        $('#passengerTable tbody').append(newRow);
+        counter++;
+      });
+
+      // Remove passenger row
+      $('#passengerTable').on('click', '.remove-passenger', function() {
+        $(this).closest('tr').remove();
+        counter--;
+      });
+      $('#bookingForm').on('click', function(event) {
+          event.preventDefault(); // Prevent form's default behavior
+          var formData = $('form').serialize(); // Ensure the correct form is referenced
+          console.log('Serialized form data:', formData);
+
+          $.ajax({
+            url: 'BookServlet', // Servlet endpoint
+            type: 'POST', // POST method
+            data: $('form').serialize()
+             , // Serialize form data
+            dataType: 'json', // Expected response data type
+            success: function(response) {
+              console.log(response);
+              var ticket = response.Ticket;
+              var passengers = response.passenegers; // Get the passenger details
+              var summary = `Booking received:\n
+                             Ticket No: ${ticket.tckt_no}\n
+                             PNR No: ${ticket.tckt_pnr_no}\n
+                             Travel Date: ${ticket.tckt_travel_date}\n
+                             From: ${ticket.tckt_from}\n
+                             To: ${ticket.tckt_to}\n
+                             Class: ${ticket.tckt_class}\n
+                             Number of Passengers: ${ticket.nop}\n
+                            `;
+
+              $('#data').text(summary);
+
+              // Clear the passenger table
+              $('#passengerTable tbody').empty();
+              console.log(passengers);
+              
+              // Populate passenger details in the table
+              passengers.forEach(function(p, index) {
+                var row = `<tr>
+                             <td>${index + 1}</td>
+                             <td>${p.psng_name}</td>
+                             <td>${p.psng_gender}</td>
+                             <td>${p.psng_age}</td>
+                             <td>${p.psng_berth}</td>
+                           </tr>`;
+                $('#ticket').append(row);
+              });
+              $('#ticket').append(
+            		  `<tr>
+                         <td colspan="5">  Total:${ticket.tckt_total}</td>
+                       </tr>`);
+            },
+            error: function(xhr, status, error) {
+              console.error('Error during submission:', status, error);
+              $('#responseMessage').text('Error occurred while submitting the form.');
+            }
+          });
+          alert("Ticket booked successfully");
+        });
+      $("#logout").click(function(){
+    	  $.ajax({
+    		  url:"logout",
+    		  type:"GET" 
+    	  })
+    	  alert("successfully logged out");
+      })
+    });
+    $("#highlightButton").click(function() {
+        $("#highlightSection").css("display", "flex");
+    });
+
+    // Hide the highlighted section when the close button is clicked
+    $("#closeButton").click(function() {
+        $("#highlightSection").css("display", "none");
+    });
+  </script>
+
+</body>
+</html>
